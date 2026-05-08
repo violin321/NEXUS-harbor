@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NEXUS Harbor
 
-## Getting Started
+NEXUS Harbor 是一个基于 Next.js 16 的自托管服务入口与状态面板，包含首页导航、服务管理、系统状态展示，以及基于 Supabase 的后台登录。
 
-First, run the development server:
+## 环境变量
+
+复制示例文件后按需填写：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+最少需要：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `DATABASE_URL`
+- `NEXT_PUBLIC_SITE_URL`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+推荐额外配置：
 
-## Learn More
+- `ADMIN_EMAILS`：逗号分隔的管理员邮箱 allowlist
+- `ADMIN_USER_IDS`：逗号分隔的管理员用户 ID allowlist
+- `ALLOW_UNRESTRICTED_ADMIN`：本地临时开发逃生开关；默认 `false`，仅在未配置 allowlist 时显式设为 `true` 才允许所有已登录用户进入 admin
+- `ALLOWED_DEV_ORIGINS`：开发环境来源白名单
 
-To learn more about Next.js, take a look at the following resources:
+`DATABASE_URL` 用于应用自己的 PostgreSQL 读写；示例格式可参考 `.env.example`，请按你的实际数据库实例填写。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+管理员策略默认 **fail-closed**：公开/生产部署必须配置 `ADMIN_EMAILS` 和/或 `ADMIN_USER_IDS`。如果两者都为空，`/admin` 与对应 API 会拒绝访问；只有在本地临时调试时显式设置 `ALLOW_UNRESTRICTED_ADMIN=true`，才会放开给所有已登录用户。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 开发启动
 
-## Deploy on Vercel
+```bash
+pnpm install
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+默认访问：<http://localhost:3000>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 数据库初始化
+
+项目提供基础 SQL：
+
+- `db/migrations/001_init.sql`：初始化业务表结构
+- `db/seeds/demo.sql`：导入演示服务数据
+
+可按顺序执行：
+
+```bash
+psql "$DATABASE_URL" -f db/migrations/001_init.sql
+psql "$DATABASE_URL" -f db/seeds/demo.sql
+```
+
+## 生产构建
+
+```bash
+pnpm build
+pnpm start
+```
+
+## 说明
+
+- 应用名称已统一为 `nexus-harbor`
+- 页面产品文案统一为 `NEXUS Harbor`
+- PostgreSQL 连接已从硬编码迁移到统一配置层
+- L3 script execution is disabled until sandbox worker design is implemented

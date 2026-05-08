@@ -30,8 +30,18 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
+!.env.example
+
+# local backups / runtime artifacts
+.openclaw-backup/
+*.bak
+pm2*.json
+logs/
+*.log
+tmp/
+dumps/
 
 # vercel
 .vercel

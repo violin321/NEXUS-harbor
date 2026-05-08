@@ -1,0 +1,32 @@
+import { AdminDashboard } from "@/components/admin/dashboard";
+import { createDbClient } from "@/lib/db";
+import { requireAdmin } from "@/modules/auth/server";
+import { ensureAppSettingsTable } from "@/modules/settings";
+
+function getLocalClient() {
+  return createDbClient();
+}
+
+export default async function AdminPage() {
+  await requireAdmin({ redirectTo: "/admin/login" });
+
+  // Fetch from local PG (not Supabase)
+  const client = getLocalClient();
+  try {
+    await client.connect();
+    const { rows } = await client.query(
+      `SELECT id, name, url, icon, group_name, enabled, check_path, expected_status, public_url, link_label, check_level, created_at FROM service_checks ORDER BY group_name, name`
+    );
+    await ensureAppSettingsTable(client);
+    const settingsRes = await client.query(`SELECT value FROM app_settings WHERE key = 'system_status_public'`);
+    const initialSettings = {
+      systemStatusPublic: settingsRes.rows[0]?.value !== 'false',
+    };
+    await client.end();
+    return <AdminDashboard initialServices={rows} initialSettings={initialSettings} />;
+  } catch (e) {
+    await client.end().catch(() => {});
+    console.error("[/admin] Failed to fetch services:", (e as Error).message);
+    return <AdminDashboard initialServices={[]} initialSettings={{ systemStatusPublic: true }} />;
+  }
+}
