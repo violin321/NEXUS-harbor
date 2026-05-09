@@ -1,5 +1,5 @@
 import { createDbClient } from '@/lib/db';
-import type { CheckLevel, DashboardData, PublicService, Service, TimelinePoint } from '@/types';
+import type { CheckLevel, DashboardData, PublicService, TimelinePoint } from '@/types';
 
 export interface ServiceRecord {
   id: string;
@@ -13,7 +13,7 @@ export interface ServiceRecord {
   public_url: string | null;
   link_label: string | null;
   check_level: CheckLevel;
-  api_config: any;
+  api_config: Record<string, unknown> | null;
   script_content: string | null;
   created_at?: string;
 }

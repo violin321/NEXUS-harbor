@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: public-anon-placeholder
+      SUPABASE_SERVICE_ROLE_KEY: service-role-placeholder
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/nexus_harbor
+      ADMIN_EMAILS: admin@example.com
+      ADMIN_USER_IDS: 00000000-0000-0000-0000-000000000000
+      ALLOW_UNRESTRICTED_ADMIN: "false"
+      ALLOWED_DEV_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect available scripts
+        id: scripts
+        shell: bash
+        run: |
+          node <<'EOF' >> "$GITHUB_OUTPUT"
+          const scripts = require('./package.json').scripts || {};
+          console.log(`has_typecheck=${Boolean(scripts.typecheck)}`);
+          EOF
+
+      - name: Run lint
+        run: pnpm lint
+
+      - name: Run typecheck
+        if: steps.scripts.outputs.has_typecheck == 'true'
+        run: pnpm typecheck
+
+      - name: Build application
+        run: pnpm build

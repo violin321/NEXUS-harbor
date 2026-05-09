@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Shield, Sun, Moon, Lock, Check, Eye, EyeOff, ExternalLink,
+  Shield, Check, Eye, EyeOff, ExternalLink,
 } from "lucide-react";
 
 
@@ -114,9 +115,9 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <a href="/" className={`mt-6 flex items-center justify-center gap-1 text-xs transition-colors ${cn("text-zinc-400 hover:text-zinc-600", "text-zinc-600 hover:text-zinc-400", dark)}`}>
+        <Link href="/" className={`mt-6 flex items-center justify-center gap-1 text-xs transition-colors ${cn("text-zinc-400 hover:text-zinc-600", "text-zinc-600 hover:text-zinc-400", dark)}`}>
           返回首页 <ExternalLink className="h-3 w-3" />
-        </a>
+        </Link>
       </div>
     </div>
   );

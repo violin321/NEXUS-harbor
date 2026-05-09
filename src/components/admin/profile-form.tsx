@@ -1,16 +1,22 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Shield, Sun, Moon, Laptop, ArrowLeft, LogOut,
+  Shield, Sun, Moon, Laptop, LogOut,
   Save, Loader2, User, KeyRound, Palette,
 } from "lucide-react";
 
+type ProfileUser = {
+  email?: string;
+};
+
 interface ProfileFormProps {
-  user: any;
+  user: ProfileUser;
   initialDisplayName: string;
   initialTheme: string;
   initialAvatar: string;
@@ -20,13 +26,12 @@ interface ProfileFormProps {
 export function ProfileForm({ user, initialDisplayName, initialTheme, initialAvatar, initialGithub }: ProfileFormProps) {
   const router = useRouter();
   const supabase = createClient();
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
   const [saving, setSaving] = useState(false);
   const [changingPw, setChangingPw] = useState(false);
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [selectedTheme, setSelectedTheme] = useState(initialTheme);
-  const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [msg, setMsg] = useState("");
@@ -66,9 +71,9 @@ export function ProfileForm({ user, initialDisplayName, initialTheme, initialAva
     try {
       const { error } = await supabase.auth.updateUser({ password: newPw });
       if (error) { setPwMsg(error.message); }
-      else { setPwMsg("密码修改成功"); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }
-    } catch (e: any) {
-      setPwMsg(e?.message || "修改失败");
+      else { setPwMsg("密码修改成功"); setNewPw(""); setConfirmPw(""); }
+    } catch (e) {
+      setPwMsg(e instanceof Error ? e.message : "修改失败");
     }
     setChangingPw(false);
   };
@@ -86,9 +91,9 @@ export function ProfileForm({ user, initialDisplayName, initialTheme, initialAva
       <nav className="relative border-b backdrop-blur-xl border-zinc-200 bg-white/80 dark:border-white/[0.06] dark:bg-[#0a0a0a]/80">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-3 py-4 sm:px-6 lg:px-12">
           <div className="flex items-center gap-3">
-            <a href="/admin" className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors">
-              <ArrowLeft className="h-3.5 w-3.5" /> 返回管理
-            </a>
+            <Link href="/admin" className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors">
+              返回管理
+            </Link>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-sm font-bold text-white shadow-sm">
               <Shield className="h-4 w-4" />
             </div>
@@ -109,7 +114,7 @@ export function ProfileForm({ user, initialDisplayName, initialTheme, initialAva
           <h2 className="text-sm font-semibold mb-4 flex items-center gap-2"><User className="h-4 w-4" /> 基本信息</h2>
           {initialAvatar && (
             <div className="flex items-center gap-3 mb-4">
-              <img src={initialAvatar} alt="avatar" className="h-12 w-12 rounded-full ring-2 ring-zinc-200 dark:ring-white/10" />
+              <Image src={initialAvatar} alt="avatar" width={48} height={48} className="h-12 w-12 rounded-full ring-2 ring-zinc-200 dark:ring-white/10" unoptimized />
               <span className="text-xs text-muted-foreground">GitHub 头像</span>
             </div>
           )}

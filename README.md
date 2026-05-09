@@ -59,6 +59,23 @@ pnpm build
 pnpm start
 ```
 
+## Poller 运行
+
+项目内置 `scripts/poller.ts`，用于按周期执行 L0/L1/L2 检测并写入 `check_results`。
+
+```bash
+pnpm poller:once   # 单次执行，适合验证配置/数据库连通性
+pnpm poller:start  # 常驻轮询，默认每 5 分钟
+```
+
+可通过 `POLLER_INTERVAL_MS` 覆盖轮询间隔。当前 L3 script execution 仍禁用，因此 poller 只会执行到 L2。
+
+## 部署文档
+
+- `docs/deployment.md`：开发、PM2、Docker Compose、反向代理部署说明
+- `docs/database.md`：数据库表结构与初始化说明
+- `docs/release-checklist.md`：公开发布前检查清单
+
 ## 说明
 
 - 应用名称已统一为 `nexus-harbor`

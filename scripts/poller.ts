@@ -7,7 +7,8 @@
  */
 import { checkAllServices } from '../src/modules/checks';
 
-const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+const POLL_INTERVAL_MS = Number(process.env.POLLER_INTERVAL_MS || 5 * 60 * 1000); // 5 minutes
+const runOnce = process.argv.includes('--once');
 
 function fmt(d: Date): string {
   return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
@@ -41,6 +42,12 @@ async function tick() {
 }
 
 async function main() {
+  if (runOnce) {
+    console.log(`[${fmt(new Date())}] 🧪 Poller 单次执行模式启动`);
+    await tick();
+    return;
+  }
+
   console.log(`[${fmt(new Date())}] 🚀 L2 API 检测轮询器启动 (每 ${POLL_INTERVAL_MS / 1000 / 60} 分钟)`);
 
   // 首次立即执行

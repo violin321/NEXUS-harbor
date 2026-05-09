@@ -2,13 +2,10 @@
 
 import { Sun, Moon, Laptop } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return <button className="h-9 w-9 rounded-full border border-border/40 bg-background/60 backdrop-blur-sm" />;
+  const { setTheme, theme, resolvedTheme } = useTheme();
+  if (!resolvedTheme) return <button className="h-9 w-9 rounded-full border border-border/40 bg-background/60 backdrop-blur-sm" />;
 
   const cycle = () => {
     if (theme === "light") setTheme("dark");

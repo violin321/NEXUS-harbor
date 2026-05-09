@@ -7,10 +7,8 @@ import { Loader2 } from "lucide-react";
 export default function AuthCallbackPage() {
   const router = useRouter();
   const [error, setError] = useState("");
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const next = new URLSearchParams(window.location.search).get("next") || "/admin";
 
     const handle = async () => {
@@ -68,15 +66,13 @@ export default function AuthCallbackPage() {
         });
         if (res.ok) router.push(next);
         else { const d = await res.json(); setError(d.error || "设置失败"); }
-      } catch (e: any) {
-        setError(e?.message || "登录失败");
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "登录失败");
       }
     };
 
-    handle();
+    void handle();
   }, [router]);
-
-  if (!mounted) return null;
 
   if (error) {
     return (

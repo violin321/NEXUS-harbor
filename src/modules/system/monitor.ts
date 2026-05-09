@@ -49,7 +49,7 @@ export async function collectSystemInfo(): Promise<SystemData> {
     // disk info unavailable
   }
 
-  let netInfo = { rxBytes: 0, txBytes: 0 };
+  const netInfo = { rxBytes: 0, txBytes: 0 };
   try {
     const netData = await exec('cat', ['/proc/net/dev']);
     const lines = netData.stdout.trim().split('\n').slice(2);

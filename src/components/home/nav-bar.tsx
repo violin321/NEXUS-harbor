@@ -31,8 +31,7 @@ export function DashboardSkeleton() {
   );
 }
 
-export function NavBar({ serviceCount, hasData, onNavigateAdmin }: {
-  serviceCount: number;
+export function NavBar({ hasData, onNavigateAdmin }: {
   hasData: boolean;
   onNavigateAdmin: () => void;
 }) {

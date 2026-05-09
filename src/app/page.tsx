@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DashboardData, PublicService, Service } from "@/types";
 import { ServiceCard } from "@/components/home/service-card";
@@ -59,14 +59,9 @@ export default function Home() {
     return resolved;
   }, [data]);
 
-  const totalServices = useMemo(() => {
-    if (!data?.groups) return 0;
-    return Object.values(data.groups).reduce((sum, g) => sum + g.length, 0);
-  }, [data]);
-
   return (
     <div className="py-8 md:py-16">
-      <NavBar serviceCount={totalServices} hasData={!!data} onNavigateAdmin={() => window.location.href = '/admin'} />
+      <NavBar hasData={!!data} onNavigateAdmin={() => window.location.href = '/admin'} />
 
       <main className="mx-auto flex w-full max-w-[1600px] flex-col gap-8 px-3 sm:px-6 lg:px-12">
         {/* System Status Card */}

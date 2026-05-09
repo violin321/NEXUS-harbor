@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDbClient } from '@/lib/db';
 import { requireSession, toAuthErrorResponse } from '@/modules/auth/server';
 
+interface ProfilePatchBody {
+  display_name?: string;
+  preferences?: Record<string, unknown>;
+}
+
 function getLocalClient() {
   return createDbClient();
 }
@@ -47,9 +52,9 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: '未登录或会话已过期' }, { status: 401 });
     }
 
-    let body;
+    let body: ProfilePatchBody;
     try {
-      body = await req.json();
+      body = (await req.json()) as ProfilePatchBody;
     } catch {
       return NextResponse.json({ error: '无效的请求数据' }, { status: 400 });
     }
@@ -73,10 +78,11 @@ export async function PATCH(req: NextRequest) {
       );
       await client.end();
       return NextResponse.json({ ok: true });
-    } catch (e: any) {
+    } catch (e) {
       await client.end().catch(() => {});
-      console.error('[profile PATCH] Error:', e?.message);
-      return NextResponse.json({ error: e?.message || '数据库错误' }, { status: 500 });
+      const message = e instanceof Error ? e.message : '数据库错误';
+      console.error('[profile PATCH] Error:', message);
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   } catch (e) {
     const authResponse = toAuthErrorResponse(e);

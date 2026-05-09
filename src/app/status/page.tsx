@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { Cpu, MemoryStick, HardDrive, Network, Container, RefreshCw, Activity, ArrowLeft } from "lucide-react";
 
 interface SystemData {
@@ -119,10 +120,10 @@ export default function StatusPage() {
       <header className="border-b border-border/40">
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-4 w-4" />
               <span>返回首页</span>
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">

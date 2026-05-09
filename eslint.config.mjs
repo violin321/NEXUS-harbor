@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local artifacts / backups:
+    ".openclaw-backup/**",
+    "logs/**",
+    "coverage/**",
   ]),
 ]);
 

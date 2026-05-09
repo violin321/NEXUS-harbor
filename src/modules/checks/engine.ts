@@ -9,6 +9,14 @@ export interface CheckResult {
   details?: Record<string, unknown>;
 }
 
+export interface ApiCheckConfig {
+  endpoint?: string;
+  method?: string;
+  response_path?: string;
+  expected_value?: string | number | boolean | null;
+  headers?: Record<string, string>;
+}
+
 export interface ServiceConfig {
   id: string;
   name: string;
@@ -16,7 +24,7 @@ export interface ServiceConfig {
   check_level: number;
   check_path: string;
   expected_status: number;
-  api_config: any;
+  api_config: ApiCheckConfig | null;
   script_content: string | null;
 }
 
@@ -26,9 +34,14 @@ function getDbClient() {
   return createDbClient();
 }
 
-function getByPath(obj: any, path: string): any {
+function getByPath(obj: unknown, path: string): unknown {
   if (!path) return obj;
-  return path.split('.').reduce((acc, key) => acc?.[key], obj);
+  return path.split('.').reduce<unknown>((acc, key) => {
+    if (acc && typeof acc === 'object' && key in acc) {
+      return (acc as Record<string, unknown>)[key];
+    }
+    return undefined;
+  }, obj);
 }
 
 export async function runL0Check(): Promise<CheckResult> {
@@ -53,12 +66,12 @@ export async function runL1Check(service: ServiceConfig): Promise<CheckResult> {
       status: res.status,
       error: null,
     };
-  } catch (e: any) {
+  } catch (e) {
     return {
       ok: false,
       latency: Date.now() - start,
       status: 0,
-      error: e?.message || '检测失败',
+      error: e instanceof Error ? e.message : '检测失败',
     };
   }
 }
@@ -85,7 +98,7 @@ export async function runL2Check(service: ServiceConfig): Promise<CheckResult> {
 
     const latency = Date.now() - start;
 
-    let json: any = null;
+      let json: unknown = null;
     try {
       json = await res.json();
     } catch {
@@ -110,12 +123,12 @@ export async function runL2Check(service: ServiceConfig): Promise<CheckResult> {
       message: ok ? '检测通过' : `期望: ${expectedValue}, 实际: ${actualValue}`,
       details: { actual: actualValue, expected: expectedValue },
     };
-  } catch (e: any) {
+  } catch (e) {
     return {
       ok: false,
       latency: Date.now() - start,
       status: 0,
-      error: e?.message || 'API 请求失败',
+      error: e instanceof Error ? e.message : 'API 请求失败',
     };
   }
 }

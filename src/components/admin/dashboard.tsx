@@ -1,13 +1,22 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "next-themes";
 import {
   Shield, Sun, Moon, Laptop, Plus, Edit2, Trash2, Save, X,
-  ExternalLink, LogOut, Loader2, ArrowLeft, UserCircle,
+  ExternalLink, LogOut, Loader2, UserCircle,
 } from "lucide-react";
+
+interface ApiConfig {
+  endpoint?: string;
+  method?: "GET" | "POST";
+  response_path?: string;
+  expected_value?: string;
+  headers?: Record<string, string>;
+}
 
 interface Service {
   id: string;
@@ -21,7 +30,7 @@ interface Service {
   public_url: string | null;
   link_label: string;
   check_level?: number;
-  api_config?: any;
+  api_config?: ApiConfig | null;
   script_content?: string;
   created_at: string;
 }
@@ -38,9 +47,7 @@ const ICON_EMOJI: Record<string, string> = {
 export function AdminDashboard({ initialServices, initialSettings }: { initialServices: Service[]; initialSettings: SettingsState }) {
   const router = useRouter();
   const supabase = createClient();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [services, setServices] = useState<Service[]>(initialServices);
   const [settings, setSettings] = useState<SettingsState>(initialSettings);
   const [loading, setLoading] = useState(false);
@@ -160,9 +167,9 @@ export function AdminDashboard({ initialServices, initialSettings }: { initialSe
       <nav className="relative border-b backdrop-blur-xl border-zinc-200 bg-white/80 dark:border-white/[0.06] dark:bg-[#0a0a0a]/80">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-3 py-4 sm:px-6 lg:px-12">
           <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors">
-              <ArrowLeft className="h-3.5 w-3.5" /> 返回首页
-            </a>
+            <Link href="/" className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors">
+              返回首页
+            </Link>
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-sm font-bold text-white shadow-sm">
               <Shield className="h-4 w-4" />
             </div>
@@ -180,7 +187,7 @@ export function AdminDashboard({ initialServices, initialSettings }: { initialSe
               className="relative h-9 w-9 rounded-xl border border-border/40 bg-background/60 backdrop-blur-sm transition-all hover:bg-background/80"
               title={theme === "system" ? "跟随系统（点击切换）" : theme === "dark" ? "深色模式（点击切换）" : "浅色模式（点击切换）"}
             >
-              {!mounted ? null : (
+              {!resolvedTheme ? null : (
                 theme === "system" ? (
                   <Laptop className="absolute inset-0 m-auto h-[1.2rem] w-[1.2rem] transition-all" />
                 ) : theme === "dark" ? (
@@ -190,9 +197,9 @@ export function AdminDashboard({ initialServices, initialSettings }: { initialSe
                 )
               )}
             </button>
-            <a href="/admin/profile" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/admin/profile" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               <UserCircle className="h-3.5 w-3.5" /> 个人资料
-            </a>
+            </Link>
             <button onClick={signOut} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-red-400 transition-colors">
               <LogOut className="h-3.5 w-3.5" /> 退出
             </button>
@@ -276,7 +283,7 @@ export function AdminDashboard({ initialServices, initialSettings }: { initialSe
                             </td>
                             <td className="py-3.5 px-5 text-xs text-muted-foreground max-w-[200px] truncate">
                               {s.public_url ? (
-                                <a href={s.public_url} target="_blank" className="text-violet-400 hover:underline flex items-center gap-1">
+                                <a href={s.public_url} target="_blank" rel="noreferrer" className="text-violet-400 hover:underline flex items-center gap-1">
                                   {s.link_label || "访问"} <ExternalLink className="h-3 w-3" />
                                 </a>
                               ) : "—"}
@@ -347,7 +354,7 @@ export function AdminDashboard({ initialServices, initialSettings }: { initialSe
                 <>
                   <Field label="API Endpoint"><input className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono text-xs outline-none focus:ring-2 focus:ring-violet-500/30 bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-white/[0.04] dark:border-white/[0.06] dark:text-white" value={form.api_config?.endpoint || ""} onChange={e => setForm(f => ({ ...f, api_config: { ...(f.api_config || {}), endpoint: e.target.value } }))} placeholder="/api/v1/status" /></Field>
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="请求方法"><select className="w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-white/[0.04] dark:border-white/[0.06] dark:text-white" value={form.api_config?.method || "GET"} onChange={e => setForm(f => ({ ...f, api_config: { ...(f.api_config || {}), method: e.target.value } }))}><option value="GET">GET</option><option value="POST">POST</option></select></Field>
+                    <Field label="请求方法"><select className="w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-white/[0.04] dark:border-white/[0.06] dark:text-white" value={form.api_config?.method || "GET"} onChange={e => setForm(f => ({ ...f, api_config: { ...(f.api_config || {}), method: e.target.value as ApiConfig["method"] } }))}><option value="GET">GET</option><option value="POST">POST</option></select></Field>
                     <Field label="期望值路径"><input className="w-full rounded-xl border px-3.5 py-2.5 text-sm font-mono text-xs outline-none focus:ring-2 focus:ring-violet-500/30 bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-white/[0.04] dark:border-white/[0.06] dark:text-white" value={form.api_config?.response_path || ""} onChange={e => setForm(f => ({ ...f, api_config: { ...(f.api_config || {}), response_path: e.target.value } }))} placeholder="data.status" /></Field>
                   </div>
                   <Field label="期望值"><input className="w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 bg-zinc-50 border-zinc-200 text-zinc-900 dark:bg-white/[0.04] dark:border-white/[0.06] dark:text-white" value={form.api_config?.expected_value || ""} onChange={e => setForm(f => ({ ...f, api_config: { ...(f.api_config || {}), expected_value: e.target.value } }))} placeholder="healthy" /></Field>

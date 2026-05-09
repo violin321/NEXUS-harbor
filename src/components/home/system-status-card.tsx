@@ -71,9 +71,13 @@ export function SystemStatusCard() {
     setLoading(false);
   }, []);
 
+
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 30000);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- polling external status is intentional here; updates occur inside the async fetch callback.
+    void fetchData();
+    const interval = setInterval(() => {
+      void fetchData();
+    }, 30000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
@@ -114,7 +118,7 @@ export function SystemStatusCard() {
           <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">本机状态</h2>
           <span className="text-[10px] text-muted-foreground ml-2">运行 {data.uptime}</span>
         </div>
-        <button onClick={fetchData} className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="刷新">
+        <button onClick={() => void fetchData()} className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="刷新">
           <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
         </button>
       </div>
@@ -124,7 +128,10 @@ export function SystemStatusCard() {
         <MetricCard icon={MemoryStick} label="内存" value={`${data.memory.percent}%`} sub={`${formatBytes(data.memory.used)} / ${formatBytes(data.memory.total)}`} percent={data.memory.percent} colorClass={memColor} />
         <MetricCard icon={HardDrive} label="磁盘" value={`${data.disk[0]?.percent ?? 0}%`} sub={data.disk[0]?.mount} percent={diskPercent} colorClass={diskColor} />
         <MetricCard icon={Network} label="网络" value={`${formatBytes(data.network.rxBytes)}`} sub={`↑ ${formatBytes(data.network.txBytes)}`} colorClass="bg-blue-400" />
-        <button onClick={() => setShowDocker(!showDocker)} className="rounded-xl bg-muted/30 p-4 text-left hover:bg-muted/50 transition-colors">
+        <button onClick={() => {
+          if (!data) return;
+          setShowDocker(!showDocker);
+        }} className="rounded-xl bg-muted/30 p-4 text-left hover:bg-muted/50 transition-colors">
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
             <Container className="h-4 w-4" />
             <span className="text-[10px] font-semibold uppercase tracking-wider">Docker</span>

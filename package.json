@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "poller:once": "tsx scripts/poller.ts --once",
+    "poller:start": "tsx scripts/poller.ts",
+    "poller:pm2": "pm2 start pm2.pollers.json",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
@@ -33,6 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
