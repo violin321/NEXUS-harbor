@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: public-anon-placeholder
       SUPABASE_SERVICE_ROLE_KEY: service-role-placeholder
