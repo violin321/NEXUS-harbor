@@ -7,6 +7,7 @@ import { ServiceCard } from "@/components/home/service-card";
 import { ThemeToggle } from "@/components/home/theme-toggle";
 import { DashboardSkeleton, NavBar } from "@/components/home/nav-bar";
 import { SystemStatusCard } from "@/components/home/system-status-card";
+import { CommandPalette } from "@/components/home/command-palette";
 
 const GROUP_LABELS: Record<string, string> = {
   api: "API 服务",
@@ -59,9 +60,23 @@ export default function Home() {
     return resolved;
   }, [data]);
 
+  const publicServices = useMemo(() => {
+    return groupEntries.flatMap(([, services]) => services);
+  }, [groupEntries]);
+
+  const openCommandPalette = useCallback(() => {
+    window.dispatchEvent(new CustomEvent("harbor:open-command-palette"));
+  }, []);
+
   return (
     <div className="py-8 md:py-16">
-      <NavBar hasData={!!data} onNavigateAdmin={() => window.location.href = '/admin'} />
+      <NavBar
+        hasData={!!data}
+        onNavigateAdmin={() => window.location.href = '/admin'}
+        onOpenSearch={openCommandPalette}
+      />
+
+      <CommandPalette services={publicServices} groupLabels={GROUP_LABELS} showTrigger={false} />
 
       <main className="mx-auto flex w-full max-w-[1600px] flex-col gap-8 px-3 sm:px-6 lg:px-12">
         {/* System Status Card */}

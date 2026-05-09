@@ -20,6 +20,7 @@ NEXUS Harbor 是一个基于 Next.js 16 的自托管 service dashboard / status 
 ## Features
 
 - **Self-hosted dashboard**：集中展示常用入口、系统概览与服务状态
+- **Global command palette (`⌘K` / `Ctrl+K`)**：按服务名、分组、链接文案或公开域名快速搜索并打开公开入口
 - **Supabase auth admin**：基于 Supabase 登录，admin 默认 fail-closed
 - **PostgreSQL-backed data model**：服务配置、检查结果、设置项统一落库
 - **Built-in poller**：内置 L0 / L1 / L2 探测写回 `check_results`
@@ -144,6 +145,19 @@ pnpm poller:start  # 常驻轮询，默认每 5 分钟
 - `docs/architecture.md`：系统架构说明
 - `docs/release-checklist.md`：公开发布前检查清单
 - `docs/open-source-readiness.md`：开源准备与对外可见性检查
+
+### Command palette
+
+在公开首页按 `⌘K`（macOS）或 `Ctrl+K`（Windows/Linux）可打开全局搜索面板，也可点击导航栏中的“⌘K 搜索”。
+
+搜索范围仅包含对 public client 可见的字段：
+
+- service name
+- group / group label
+- `linkLabel`
+- `publicUrl` 的可见域名与路径
+
+选择结果后会以新标签页打开 `publicUrl`。实现不会把 internal/local `url` 字段带到 public DTO 或 client 搜索索引中，因此 demo mode synthetic services 也可直接参与搜索。
 
 ## Security notes
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { appConfig } from "@/lib/config";
+import { Search } from "lucide-react";
 
 export function DashboardSkeleton() {
   return (
@@ -31,9 +31,10 @@ export function DashboardSkeleton() {
   );
 }
 
-export function NavBar({ hasData, onNavigateAdmin }: {
+export function NavBar({ hasData, onNavigateAdmin, onOpenSearch }: {
   hasData: boolean;
   onNavigateAdmin: () => void;
+  onOpenSearch?: () => void;
 }) {
   return (
     <nav className="border-b border-border/40">
@@ -43,11 +44,18 @@ export function NavBar({ hasData, onNavigateAdmin }: {
             N
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-tight text-foreground">{appConfig.productName}</h1>
+            <h1 className="text-sm font-bold tracking-tight text-foreground">NEXUS Harbor</h1>
             <p className="text-[11px] text-muted-foreground">NEXUS-9 · self-hosted service gateway</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={onOpenSearch}
+            className="hidden items-center gap-2 rounded-xl border border-border/50 bg-background/70 px-3 py-2 text-[11px] text-muted-foreground shadow-sm transition hover:border-border hover:text-foreground sm:inline-flex"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <span>⌘K 搜索</span>
+          </button>
           <button onClick={onNavigateAdmin} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
             管理
           </button>
