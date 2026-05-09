@@ -21,7 +21,7 @@ VALUES
     TRUE,
     '/api/health',
     200,
-    'http://localhost:3000',
+    'https://demo.example.com',
     '打开演示',
     2,
     '{"endpoint":"/api/health","method":"GET","response_path":"status","expected_value":"ok"}'::jsonb,

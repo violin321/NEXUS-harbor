@@ -15,7 +15,7 @@ INSERT INTO service_checks (
 VALUES
   (
     'NEXUS Harbor Demo',
-    'http://127.0.0.1:3000',
+    'http://demo-web.internal.example',
     'layout',
     'web',
     TRUE,
@@ -29,7 +29,7 @@ VALUES
   ),
   (
     'OpenClaw Gateway Demo',
-    'http://127.0.0.1:8317',
+    'http://demo-gateway.internal.example',
     'gateway',
     'core',
     TRUE,
@@ -43,7 +43,7 @@ VALUES
   ),
   (
     'Search Demo Service',
-    'http://127.0.0.1:8080',
+    'http://demo-search.internal.example',
     'search',
     'api',
     TRUE,

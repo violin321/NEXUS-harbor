@@ -16,6 +16,9 @@ NEXUS Harbor 通过环境变量驱动配置，适合本地开发、自托管部�
 
 - `ADMIN_EMAILS`：逗号分隔的管理员邮箱 allowlist，例如 `alice@example.com,bob@example.com`
 - `ADMIN_USER_IDS`：逗号分隔的管理员用户 ID allowlist，用于邮箱不稳定或需要直接按用户 ID 授权的场景
+- `DEMO_MODE`：服务端 demo mode 开关；启用后公开 dashboard / system status 返回 synthetic 数据
+- `NEXT_PUBLIC_DEMO_MODE`：客户端可见的 demo mode 标记；仅用于渲染提示，不携带 secret
+- `DEMO_READ_ONLY`：显式只读开关；未开启 `DEMO_MODE` 时也可用于预览环境禁写
 - `ALLOW_UNRESTRICTED_ADMIN`：本地临时开发逃生开关；默认 `false`，只有在未配置 allowlist 时显式设为 `true` 才允许所有已登录用户进入 admin
 - `ALLOWED_DEV_ORIGINS`：逗号分隔的开发来源白名单，例如：
 
@@ -43,5 +46,22 @@ psql "$DATABASE_URL" -f db/seeds/demo.sql
 ```
 
 `app_settings.system_status_public` 默认值为 `false`。如果你确实希望公开系统摘要信息，应在后台或数据库中显式打开。
+
+## Public demo 安全边界
+
+建议公开演示站使用：
+
+```env
+DEMO_MODE=true
+NEXT_PUBLIC_DEMO_MODE=true
+DEMO_READ_ONLY=true
+```
+
+在该模式下：
+
+- `/api/dashboard` 返回 synthetic demo 数据，可脱离真实私有服务 URL 运行
+- `/api/system-public` 返回 synthetic system status，不读取真实 host metrics / Docker 列表
+- admin 写接口拒绝写入，避免演示环境误改配置
+- `SUPABASE_SERVICE_ROLE_KEY` 仍仅限服务端使用，不应出现在任何 client-visible path
 
 L3 script execution is disabled until sandbox worker design is implemented.

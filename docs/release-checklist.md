@@ -47,8 +47,10 @@ git log --all -p -G 'postgresql://|SUPABASE|service_role'
 
 - [ ] 在目标数据库执行 `db/migrations/001_init.sql`
 - [ ] 仅在需要演示数据时执行对应 seed：本地 / 宿主机用 `db/seeds/demo.sql`，Docker Compose demo 用 `db/seeds/demo-compose.sql`
+- [ ] 如为 public demo，确认已显式启用 `DEMO_MODE=true`、`NEXT_PUBLIC_DEMO_MODE=true`、`DEMO_READ_ONLY=true`
 - [ ] 确认 `system_status_public` 是否符合公开策略
 - [ ] 验证 admin allowlist 实际生效
+- [ ] 验证公开 dashboard / system status 不读取真实私有服务 URL、主机指标或可见的 service role key
 
 ## 5. 部署演练
 
@@ -60,6 +62,7 @@ git log --all -p -G 'postgresql://|SUPABASE|service_role'
 ## 6. 对外发布前最后确认
 
 - [ ] README / deployment 文档可让外部开发者独立跑起来
+- [ ] README 中的 public demo 说明明确标注 synthetic / read-only，不暗示真实运维环境可见
 - [ ] repo visibility 切换前再做一轮 secret 检查
 - [ ] 确认不会把 `.env.local`、`.env.production`、数据库备份、日志目录一并公开
 - [ ] 如启用 poller，至少完成一次 `pnpm poller:once` 或等价 dry-run 验证

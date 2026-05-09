@@ -1,4 +1,5 @@
 import { AdminDashboard } from "@/components/admin/dashboard";
+import { appConfig } from "@/lib/config";
 import { createDbClient } from "@/lib/db";
 import { requireAdmin } from "@/modules/auth/server";
 import { ensureAppSettingsTable } from "@/modules/settings";
@@ -24,12 +25,14 @@ export default async function AdminPage() {
     const settingsRes = await client.query(`SELECT value FROM app_settings WHERE key = 'system_status_public'`);
     const initialSettings = {
       systemStatusPublic: settingsRes.rows[0]?.value !== 'false',
+      demoMode: appConfig.demoMode,
+      demoReadOnly: appConfig.demoReadOnly,
     };
     await client.end();
     return <AdminDashboard initialServices={rows} initialSettings={initialSettings} initialSetupStatus={setupStatus} />;
   } catch (e) {
     await client.end().catch(() => {});
     console.error("[/admin] Failed to fetch services:", (e as Error).message);
-    return <AdminDashboard initialServices={[]} initialSettings={{ systemStatusPublic: true }} initialSetupStatus={setupStatus} />;
+    return <AdminDashboard initialServices={[]} initialSettings={{ systemStatusPublic: true, demoMode: appConfig.demoMode, demoReadOnly: appConfig.demoReadOnly }} initialSetupStatus={setupStatus} />;
   }
 }

@@ -84,6 +84,25 @@ cp .env.example .env.local
 - `DATABASE_URL`
 - `NEXT_PUBLIC_SITE_URL`
 
+### Public demo mode
+
+如需一个可公开展示、不会暴露真实私有服务的演示站，启用显式 demo mode：
+
+```env
+DEMO_MODE=true
+NEXT_PUBLIC_DEMO_MODE=true
+DEMO_READ_ONLY=true
+```
+
+此模式下：
+
+- 首页 `/api/dashboard` 返回 synthetic demo 数据，不依赖真实私有服务 URL
+- `/api/system-public` 返回 synthetic system status，不读取真实 host / Docker metrics
+- admin 写接口（services/settings）拒绝写入，public demo 默认只读
+- 公开截图 / live demo 应只展示 demo mode 数据，不展示真实运维环境
+
+README 中的公开 demo 说明默认建立在以上配置之上；完整部署说明见 `docs/deployment.md`。
+
 推荐额外配置：
 
 - `ADMIN_EMAILS`：逗号分隔的管理员邮箱 allowlist
@@ -131,6 +150,8 @@ pnpm poller:start  # 常驻轮询，默认每 5 分钟
 - admin 默认 **fail-closed**：公开/生产部署必须配置 `ADMIN_EMAILS` 和/或 `ADMIN_USER_IDS`
 - 如果两者都为空，`/admin` 与对应 API 会拒绝访问
 - `ALLOW_UNRESTRICTED_ADMIN=true` 仅用于本地临时调试，不应作为公开部署方案
+- `DEMO_MODE=true` 时，公开首页与 system status 走 synthetic 数据，不读取真实私有服务或主机指标
+- public demo 不应在任何 client-visible path 暴露 `SUPABASE_SERVICE_ROLE_KEY`；该 key 仅限服务端使用
 - `/admin` 顶部内置 setup checklist，仅返回布尔/状态/提示/安全命令，不回显真实 env 值或数据库凭据
 - 生产环境建议使用独立 `.env.production`，并确保真实 secret 不进入 tracked files
 

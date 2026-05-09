@@ -38,6 +38,8 @@ interface Service {
 
 interface SettingsState {
   systemStatusPublic: boolean;
+  demoMode?: boolean;
+  demoReadOnly?: boolean;
 }
 
 const ICON_EMOJI: Record<string, string> = {
@@ -180,7 +182,7 @@ export function AdminDashboard({ initialServices, initialSettings, initialSetupS
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={startAdd} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm shadow-violet-500/20 hover:shadow-md hover:shadow-violet-500/25 transition-all">
+            <button onClick={startAdd} disabled={!!settings.demoReadOnly} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm shadow-violet-500/20 hover:shadow-md hover:shadow-violet-500/25 transition-all disabled:cursor-not-allowed disabled:opacity-60">
               <Plus className="h-3.5 w-3.5" /> 添加
             </button>
             <button
@@ -219,7 +221,8 @@ export function AdminDashboard({ initialServices, initialSettings, initialSetupS
             </div>
             <button
               onClick={toggleSystemStatusPublic}
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+              disabled={!!settings.demoReadOnly}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
                 settings.systemStatusPublic
                   ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
                   : "bg-zinc-500/10 text-zinc-500 hover:bg-zinc-500/20"
@@ -228,6 +231,14 @@ export function AdminDashboard({ initialServices, initialSettings, initialSetupS
               {settings.systemStatusPublic ? "● 已公开" : "○ 未公开"}
             </button>
           </div>
+          {settings.demoMode ? (
+            <div className="mt-4 rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 text-xs text-blue-700 dark:text-blue-300">
+              <p className="font-medium">当前为 Demo Mode</p>
+              <p className="mt-1 text-blue-700/80 dark:text-blue-300/80">
+                首页与公开状态接口返回 synthetic 数据，不读取真实私有服务；管理写操作默认只读。
+              </p>
+            </div>
+          ) : null}
         </section>
 
         {loading ? (
@@ -292,7 +303,7 @@ export function AdminDashboard({ initialServices, initialSettings, initialSetupS
                               ) : "—"}
                             </td>
                             <td className="py-3.5 px-5 text-center">
-                              <button onClick={() => toggleEnabled(s)} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all ${
+                              <button onClick={() => toggleEnabled(s)} disabled={!!settings.demoReadOnly} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
                                 s.enabled ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25" : "bg-zinc-500/10 text-zinc-500 hover:bg-zinc-500/20"
                               }`}>
                                 {s.enabled ? "● 启用" : "○ 停用"}
@@ -300,10 +311,10 @@ export function AdminDashboard({ initialServices, initialSettings, initialSetupS
                             </td>
                             <td className="py-3.5 px-5">
                               <div className="flex items-center justify-end gap-0.5">
-                                <button onClick={() => { setEditing(s.id); setForm({ ...s }); }} className="rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                                <button onClick={() => { setEditing(s.id); setForm({ ...s }); }} disabled={!!settings.demoReadOnly} className="rounded-lg p-2 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors disabled:cursor-not-allowed disabled:opacity-40">
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </button>
-                                <button onClick={() => remove(s.id)} className="rounded-lg p-2 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                                <button onClick={() => remove(s.id)} disabled={!!settings.demoReadOnly} className="rounded-lg p-2 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:cursor-not-allowed disabled:opacity-40">
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </button>
                               </div>
@@ -379,7 +390,7 @@ export function AdminDashboard({ initialServices, initialSettings, initialSetupS
             </div>
             <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-border/40">
               <button onClick={() => setEditing(null)} className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"><X className="h-3.5 w-3.5" /> 取消</button>
-              <button onClick={save} disabled={saving} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-4 py-2 text-xs font-medium text-white shadow-sm shadow-violet-500/20 hover:shadow-md disabled:opacity-50">{saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} 保存</button>
+              <button onClick={save} disabled={saving || !!settings.demoReadOnly} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 px-4 py-2 text-xs font-medium text-white shadow-sm shadow-violet-500/20 hover:shadow-md disabled:opacity-50">{saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} 保存</button>
             </div>
           </div>
         </div>

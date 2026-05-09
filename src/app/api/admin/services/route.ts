@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, toAuthErrorResponse } from '@/modules/auth/server';
+import { enforceDemoReadOnly } from '@/modules/demo/guards';
 import { createService, deleteService, listServices, updateService } from '@/modules/services';
 
 export async function GET() {
@@ -17,6 +18,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     await requireAdmin();
+    enforceDemoReadOnly();
     const body = await req.json();
     const { action, data, id } = body;
 
@@ -37,6 +39,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (e) {
+    if (e instanceof Response) return e;
     const authResponse = toAuthErrorResponse(e);
     if (authResponse) return authResponse;
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

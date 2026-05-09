@@ -33,6 +33,21 @@ cp .env.example .env.local
 - `ADMIN_USER_IDS`：逗号分隔的管理员用户 ID allowlist
 - `ALLOWED_DEV_ORIGINS`：本地开发来源白名单
 
+### Public demo 配置
+
+如需公开演示站，显式启用：
+
+- `DEMO_MODE=true`
+- `NEXT_PUBLIC_DEMO_MODE=true`
+- `DEMO_READ_ONLY=true`
+
+效果：
+
+- 首页 dashboard 改用 synthetic demo 数据
+- `/api/system-public` 返回 synthetic system status
+- admin 写接口拒绝写入，演示站保持只读
+- public demo 可运行，但不应映射到真实运维服务 URL
+
 ### 仅限本地临时调试
 
 - `ALLOW_UNRESTRICTED_ADMIN=true`
@@ -50,8 +65,8 @@ pnpm dev
 
 其中：
 
-- `db/seeds/demo.sql` 面向本地开发 / 宿主机访问，默认示例目标是 `127.0.0.1`。
-- `db/seeds/demo-compose.sql` 面向 Docker Compose 演示环境，默认检测 `app` 容器内的 `/api/health`，避免容器网络下全部探测指向宿主机回环地址而全红。
+- `db/seeds/demo.sql` 面向本地开发 / 宿主机访问，默认使用 synthetic / example 命名的示例目标，不应被理解为真实私有服务地址。
+- `db/seeds/demo-compose.sql` 面向 Docker Compose 演示环境，默认检测 `app` 容器内的 `/api/health`，公开链接使用 `https://demo.example.com` 这类安全示例地址。
 
 默认访问：<http://localhost:3000>
 
@@ -142,7 +157,7 @@ Compose 示例包含：
 docker compose -f docker-compose.example.yml --profile poller up --build -d
 ```
 
-注意：Compose 示例默认使用容器网络可达的 demo seed，因此 poller 至少可以对 `app` 自身健康接口做一次可解释的绿色检查；如果你想复用宿主机场景的 `db/seeds/demo.sql`，需要同步把其中的目标地址改成容器内可解析的主机名或服务名。
+注意：Compose 示例默认使用容器网络可达的 demo seed，因此 poller 至少可以对 `app` 自身健康接口做一次可解释的绿色检查；如果你想复用宿主机场景的 `db/seeds/demo.sql`，需要同步把其中的目标地址改成你自己的可解析主机名或服务名。对于 public demo，更推荐直接启用 `DEMO_MODE=true`，让公开首页与状态接口完全走 synthetic 数据。
 
 ## 5. Reverse proxy
 
@@ -184,6 +199,7 @@ harbor.example.com {
 4. admin allowlist 生效
 5. `service_checks` 与 `check_results` 可正常读写
 6. `system_status_public` 是否符合你的公开策略
+7. 如为 public demo，确认 `DEMO_MODE=true` 且 demo 站不依赖真实私有服务 URL
 
 ## 7. 已知限制
 

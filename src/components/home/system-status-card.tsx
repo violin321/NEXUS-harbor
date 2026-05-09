@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Cpu, MemoryStick, HardDrive, Network, Container, RefreshCw } from "lucide-react";
 
 interface SystemData {
+  mode?: 'demo';
   cpu: { percent: number; cores: number; model: string };
   memory: { total: number; used: number; percent: number };
   disk: Array<{ mount: string; total: number; used: number; percent: number }>;
@@ -117,6 +118,7 @@ export function SystemStatusCard() {
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
           <h2 className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">本机状态</h2>
           <span className="text-[10px] text-muted-foreground ml-2">运行 {data.uptime}</span>
+          {data.mode === 'demo' ? <span className="text-[10px] text-blue-400 ml-2">Synthetic demo</span> : null}
         </div>
         <button onClick={() => void fetchData()} className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="刷新">
           <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
