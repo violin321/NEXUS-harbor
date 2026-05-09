@@ -40,6 +40,8 @@ pnpm dev
 
 默认访问：<http://localhost:3000>
 
+首次启动后，可在 `/admin` 顶部看到 setup checklist：它会检查关键 env、数据库连通性、核心表结构、`service_checks` 是否已有数据，以及 admin allowlist 是否已配置，并给出安全的 copy-paste 命令。页面只显示状态与下一步，不会把真实 secret 回显到浏览器。
+
 ### Production build
 
 ```bash
@@ -129,6 +131,7 @@ pnpm poller:start  # 常驻轮询，默认每 5 分钟
 - admin 默认 **fail-closed**：公开/生产部署必须配置 `ADMIN_EMAILS` 和/或 `ADMIN_USER_IDS`
 - 如果两者都为空，`/admin` 与对应 API 会拒绝访问
 - `ALLOW_UNRESTRICTED_ADMIN=true` 仅用于本地临时调试，不应作为公开部署方案
+- `/admin` 顶部内置 setup checklist，仅返回布尔/状态/提示/安全命令，不回显真实 env 值或数据库凭据
 - 生产环境建议使用独立 `.env.production`，并确保真实 secret 不进入 tracked files
 
 ## Known limitations

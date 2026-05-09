@@ -9,6 +9,7 @@ import {
   Shield, Sun, Moon, Laptop, Plus, Edit2, Trash2, Save, X,
   ExternalLink, LogOut, Loader2, UserCircle,
 } from "lucide-react";
+import { SetupChecklist, type SetupStatus } from "@/components/admin/setup-checklist";
 
 interface ApiConfig {
   endpoint?: string;
@@ -44,7 +45,7 @@ const ICON_EMOJI: Record<string, string> = {
   layout: "📋", bot: "🤖", chart: "📊", gateway: "🌐", monitor: "📈",
 };
 
-export function AdminDashboard({ initialServices, initialSettings }: { initialServices: Service[]; initialSettings: SettingsState }) {
+export function AdminDashboard({ initialServices, initialSettings, initialSetupStatus }: { initialServices: Service[]; initialSettings: SettingsState; initialSetupStatus: SetupStatus }) {
   const router = useRouter();
   const supabase = createClient();
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -208,6 +209,8 @@ export function AdminDashboard({ initialServices, initialSettings }: { initialSe
       </nav>
 
       <main className="relative mx-auto max-w-[1600px] px-3 py-8 sm:px-6 lg:px-12">
+        <SetupChecklist initialStatus={initialSetupStatus} />
+
         <section className="mb-8 rounded-2xl border border-zinc-200 bg-white/70 p-5 backdrop-blur-xl dark:border-white/[0.06] dark:bg-white/[0.02]">
           <div className="flex items-center justify-between gap-4">
             <div>
